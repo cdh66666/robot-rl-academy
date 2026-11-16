@@ -2,103 +2,103 @@
   "videos": [
     {
       "id": "01",
-      "title": "让机器人学会：从零到部署全景",
+      "title": "先训练一次，再看懂机器人学习的全貌",
       "file": "output/01.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/01.mp4",
       "subtitle": "output/01.srt",
       "cover": "output/01-cover.png",
       "chapters": "output/01-chapters.txt",
-      "duration_seconds": 173.45,
-      "uses_real_browser_video": true
+      "duration_seconds": 1959.637
     },
     {
       "id": "02",
-      "title": "状态、动作、奖励：一次互动发生了什么",
+      "title": "把机器人任务翻译成观察、动作与奖励",
       "file": "output/02.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/02.mp4",
       "subtitle": "output/02.srt",
       "cover": "output/02-cover.png",
       "chapters": "output/02-chapters.txt",
-      "duration_seconds": 176.16,
-      "uses_real_browser_video": true
+      "duration_seconds": 1890.792
     },
     {
       "id": "03",
-      "title": "神经网络与 DQN：策略是怎么学出来的",
+      "title": "拆开 DQN：网络怎样从失败中学会决策",
       "file": "output/03.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/03.mp4",
       "subtitle": "output/03.srt",
       "cover": "output/03-cover.png",
       "chapters": "output/03-chapters.txt",
-      "duration_seconds": 236.4,
-      "uses_real_browser_video": true
+      "duration_seconds": 1905.792
     },
     {
       "id": "04",
-      "title": "开始训练：读懂曲线，检验效果",
+      "title": "从 DQN 到 PPO：让策略输出连续动作",
       "file": "output/04.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/04.mp4",
       "subtitle": "output/04.srt",
       "cover": "output/04-cover.png",
       "chapters": "output/04-chapters.txt",
-      "duration_seconds": 181.62,
-      "uses_real_browser_video": true
+      "duration_seconds": 1861.5
     },
     {
       "id": "05",
-      "title": "MuJoCo 4：把机器人变成可训练的世界",
+      "title": "MuJoCo 建模：把机器人变成可验证的物理环境",
       "file": "output/05.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/05.mp4",
       "subtitle": "output/05.srt",
       "cover": "output/05-cover.png",
       "chapters": "output/05-chapters.txt",
-      "duration_seconds": 181.71,
-      "uses_real_browser_video": true
+      "duration_seconds": 2042.292
     },
     {
       "id": "06",
-      "title": "奖励与失败：让进步真的有意义",
+      "title": "奖励设计与训练故障诊断",
       "file": "output/06.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/06.mp4",
       "subtitle": "output/06.srt",
       "cover": "output/06-cover.png",
       "chapters": "output/06-chapters.txt",
-      "duration_seconds": 172.23,
-      "uses_real_browser_video": true
+      "duration_seconds": 1898.718
     },
     {
       "id": "07",
-      "title": "电机与辨识：把硬件差异放进模型",
+      "title": "总线舵机、无刷驱动与系统辨识",
       "file": "output/07.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/07.mp4",
       "subtitle": "output/07.srt",
       "cover": "output/07-cover.png",
       "chapters": "output/07-chapters.txt",
-      "duration_seconds": 235.61,
-      "uses_real_browser_video": true
+      "duration_seconds": 1857.962
     },
     {
       "id": "08",
-      "title": "仿真到现实：随机化不是万能药",
+      "title": "仿真到真实：辨识、扰动与鲁棒性",
       "file": "output/08.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/08.mp4",
       "subtitle": "output/08.srt",
       "cover": "output/08-cover.png",
       "chapters": "output/08-chapters.txt",
-      "duration_seconds": 180.03,
-      "uses_real_browser_video": true
+      "duration_seconds": 1836.585
     },
     {
       "id": "09",
-      "title": "部署与换主控：谁负责决策，谁负责执行",
+      "title": "模型导出、接口契约与更换主控",
       "file": "output/09.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/09.mp4",
       "subtitle": "output/09.srt",
       "cover": "output/09-cover.png",
       "chapters": "output/09-chapters.txt",
-      "duration_seconds": 181.01,
-      "uses_real_browser_video": false
+      "duration_seconds": 1877.81
     },
     {
       "id": "10",
-      "title": "完整实战：从仿真训练到真机验证路线",
+      "title": "单关节完整实战与真实机器人迁移路线",
       "file": "output/10.mp4",
+      "remote_file": "https://github.com/cdh66666/robot-rl-academy/releases/download/course-v2/10.mp4",
       "subtitle": "output/10.srt",
       "cover": "output/10-cover.png",
       "chapters": "output/10-chapters.txt",
-      "duration_seconds": 389.6,
-      "uses_real_browser_video": false
+      "duration_seconds": 1831.208
     }
   ]
 }

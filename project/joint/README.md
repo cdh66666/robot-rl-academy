@@ -58,6 +58,21 @@ python -m venv .venv
 
 第二条命令必须指定生成 ONNX 所用的同一份 SB3 策略，比较的结果与路径保存在 `exported_check\deployment_contract_check.json`。若使用自己重新训练的策略，请将导出、对照与离线推理路径一起改为对应的文件。省略 `--model` 时，契约检查仍默认读取 `--artifacts` 目录里的 `joint_ppo.zip`，所以前面的 `my_run` 旧命令也可继续使用。
 
+第 09 集的第二周期是**人为固定输入的离线演示**，默认 `deploy_offline.py` 只打印第一周期。想复现两次推理，可在同一 PowerShell 复制下面整段运行；若上面换了输出目录，这里也要修改 ONNX 路径：
+
+```powershell
+@'
+from deploy_offline import OfflineJointPolicy
+policy = OfflineJointPolicy("exported_check/joint_actor.onnx")
+policy.reset(0.10)
+for _ in range(2):
+    print(policy.infer(angle_rad=0.10, velocity_rad_s=0.0,
+                       target_rad=0.50, sample_age_s=0.0))
+'@ | .\.venv\Scripts\python.exe -
+```
+
+本机使用随包策略重新导出后，第一周期输出参考 0.16 rad，第二周期输出 0.22 rad；第二次的第四个输入为 `0.16 / 0.9`。两次角度、速度和目标都是人为输入，不是传感器读数，也没有连接硬件。
+
 `inspect_model.py` 会从零角度分别在两个独立仿真中请求 `+0.4` 和 `−0.4 rad` 位置参考，各运行 20 个控制周期；显示模型时间步、输入和力矩范围、参考的单周期最大变化、正负方向的最终角度，并将每个控制周期的样本写入你指定的 JSON。在本机默认模型一次运行中，首周期应用参考为 ±0.06 rad，20 周期后的角度约 ±0.37256 rad；每个物理步采样到的执行器力矩绝对值峰值约 0.661 N·m，低于该模拟模型的 ±1.5 N·m 限制。你的结果可能因环境不同而略有差异；这只检查两个模拟输入，不能证明真实机器人方向、标定、力矩或安全。
 
 本机验证环境为 Windows 64 位、Python 3.13.12、Gymnasium 1.4.0、MuJoCo 4.0.1、Stable-Baselines3 2.9.2、PyTorch 2.12.0（训练指定 CPU）、ONNX 1.21.0 和 ONNX Runtime 1.26.0。2026-11-16 已在不继承系统包的新虚拟环境里，按本包 `requirements.txt` 安装并从解压包完成训练、评估、导出及离线接口检查；这次使用了本机配置的 Python 包镜像。其他系统、网络或后续依赖供应可能产生不同结果。

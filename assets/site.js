@@ -3,7 +3,10 @@
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { lessons: [], videos: new Map(), done: readJson("robot-rl-done", []), robot: readJson("robot-rl-contract", {}) };
+  // The long course has new material; a completed short preview is not a
+  // completed long episode. Keep robot forms, but start a separate progress log.
+  const progressKey = "robot-rl-done-long-v2";
+  const state = { lessons: [], videos: new Map(), done: readJson(progressKey, []), robot: readJson("robot-rl-contract", {}) };
 
   function readJson(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
@@ -44,7 +47,18 @@
     const file = String(item.file);
     if (file.includes("..") || /^(?:[a-z]+:|\/)/i.test(file)) return "";
     const safe = path => path && !String(path).includes("..") && !/^(?:[a-z]+:|\/)/i.test(String(path));
-    return `<div class="video-shell"><video controls preload="metadata" playsinline src="${esc(`video/${file}`)}">你的浏览器无法播放视频。</video></div><div class="video-caption">本集可在这里直接观看。${safe(item.subtitle) ? ` <a class="text-link" href="${esc(`video/${item.subtitle}`)}" download>下载字幕</a>` : ""}${safe(item.chapters) ? ` · <a class="text-link" href="${esc(`video/${item.chapters}`)}" download>下载章节时间码</a>` : ""}</div>`;
+    // The public long-course videos are release assets; keep the website itself
+    // small. Only accept this repository's expected, episode-specific URL.
+    let remote = "";
+    try {
+      const u = new URL(item.remote_file || "");
+      if (u.protocol === "https:" && u.hostname === "github.com" && u.pathname === `/cdh66666/robot-rl-academy/releases/download/course-v2/${id}.mp4` && !u.search && !u.hash) remote = u.href;
+    } catch { /* Older course manifests have only local files. */ }
+    const local = `video/${file}`;
+    const localServer = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+    const source = remote && !localServer ? remote : local;
+    const fallback = remote && localServer ? ` data-remote-fallback="${esc(remote)}"` : "";
+    return `<div class="video-shell"><video controls preload="metadata" playsinline src="${esc(source)}"${fallback}>你的浏览器无法播放视频。</video></div><div class="video-caption">本集可在这里直接观看。${remote ? ` <a class="text-link" href="${esc(remote)}" target="_blank" rel="noopener noreferrer">打开视频文件</a>` : ""}${safe(item.subtitle) ? ` · <a class="text-link" href="${esc(`video/${item.subtitle}`)}" download>下载字幕</a>` : ""}${safe(item.chapters) ? ` · <a class="text-link" href="${esc(`video/${item.chapters}`)}" download>下载章节时间码</a>` : ""}</div>`;
   }
   function renderLesson(id) {
     const lesson = lessonById(id);
@@ -66,12 +80,22 @@
     $("#lesson-content").innerHTML = `
       <div class="lesson-head"><div class="lesson-crumb"><a href="#start">学习路线</a> / 第 ${esc(id)} 课</div><span class="section-tag">${esc(lesson.duration || "动手学习")}</span><h1>${esc(lesson.title)}</h1><p class="why">${esc(lesson.why)}</p><div class="lesson-meta"><span class="pill">学完后动手做</span><span>看视频 · 读重点 · 做练习</span></div></div>
       <div class="lesson-body"><div class="outcome"><div><h2>这一课学什么</h2><p>${esc(lesson.objective)}</p></div><div><h2>学完能做什么</h2><p>${esc(lesson.outcome)}</p></div></div><article class="content-card lesson-video"><div class="card-label">本课视频</div>${videoHtml(lesson)}</article>
-      <div class="lesson-grid"><div class="lesson-text"><article class="content-card"><div class="card-label">核心内容</div>${blocks}</article>${chapters ? `<article class="content-card"><div class="card-label">章节与跟练</div><h2>按步骤学，每一章都能动手</h2><p>展开章节查看操作、预期结果和讲解文字；也可以跳到对应视频位置。</p>${chapters}</article>` : ''}<article class="content-card"><div class="card-label">亲手试一试</div><h2>按照这几步做</h2><ol class="practice-list">${practices}</ol><div class="lesson-actions"><a class="button secondary" href="#lab">打开训练实验室</a>${index >= 6 ? '<a class="button secondary" href="#robot">填写机器人接口表</a>' : ""}${id === "07" ? '<a class="button secondary" href="content/identification_demo/browser.html" target="_blank">打开网页辨识实验</a>' : ""}${id === "10" ? '<a class="button secondary" href="project/joint/guide.html" target="_blank">打开单关节实战</a>' : ""}</div></article><article class="content-card"><div class="card-label">检查是否理解</div><h2>试着自己回答</h2>${checks}</article></div>
+      <div class="lesson-grid"><div class="lesson-text"><article class="content-card"><div class="card-label">核心内容</div>${blocks}</article>${chapters ? `<article class="content-card"><div class="card-label">章节与跟练</div><h2>按步骤学，每一章都能动手</h2><p>展开章节查看操作、预期结果和讲解文字；也可以跳到对应视频位置。</p>${chapters}</article>` : ''}<article class="content-card"><div class="card-label">亲手试一试</div><h2>按照这几步做</h2><ol class="practice-list">${practices}</ol><div class="lesson-actions"><a class="button secondary" href="#lab">打开训练实验室</a>${id === "02" || index >= 6 ? '<a class="button secondary" href="#robot">填写机器人接口表</a>' : ""}${id === "07" ? '<a class="button secondary" href="content/identification_demo/browser.html" target="_blank">打开网页辨识实验</a>' : ""}${id === "04" ? '<a class="button secondary" href="project/guide.html" target="_blank">打开连续动作跟练</a>' : ""}${["05","09","10"].includes(id) ? '<a class="button secondary" href="project/joint/guide.html" target="_blank">打开单关节实战</a>' : ""}</div></article><article class="content-card"><div class="card-label">检查是否理解</div><h2>试着自己回答</h2>${checks}</article></div>
       <aside class="lesson-support"><article class="content-card"><div class="card-label">继续查证</div><h2>本课资料</h2><ul class="source-list">${sources}</ul></article></aside></div>
       <div class="lesson-actions"><button class="button ${done ? "secondary" : "primary"}" id="mark-done" data-id="${esc(id)}">${done ? "✓ 已标记完成" : "标记本课完成"}</button>${previous ? `<a class="button ghost" href="${lessonUrl(String(previous.id).padStart(2,"0"))}">上一课</a>` : ""}${next ? `<a class="button ghost next" href="${lessonUrl(String(next.id).padStart(2,"0"))}">下一课：${esc(next.title)} ↗</a>` : '<a class="button ghost next" href="#robot">整理你的机器人项目 ↗</a>'}</div></div>`;
     $("#mark-done")?.addEventListener("click", () => {
       state.done = done ? state.done.filter(x => x !== id) : [...new Set([...state.done,id])];
-      writeJson("robot-rl-done",state.done); renderLesson(id); updateNavigation(id);
+      writeJson(progressKey,state.done); renderLesson(id); updateNavigation(id);
+    });
+    const videoElement = $("#lesson-content video");
+    videoElement?.addEventListener("error", () => {
+      const fallback = videoElement.dataset.remoteFallback;
+      if (fallback) { delete videoElement.dataset.remoteFallback; videoElement.src = fallback; videoElement.load(); return; }
+      const caption = videoElement.closest('.video-shell')?.nextElementSibling;
+      if (caption && !caption.querySelector('[role="status"]')) {
+        const notice = document.createElement('span'); notice.setAttribute('role','status');
+        notice.textContent = ' 视频暂时无法加载；请检查网络或尝试打开视频文件。'; caption.appendChild(notice);
+      }
     });
     $$('.jump-video', $('#lesson-content')).forEach(button => button.addEventListener('click', () => {
       const video = $('#lesson-content video');
