@@ -6,3 +6,4 @@
 .faq{margin-top:45px;max-width:850px}.faq h2{font-size:23px;margin:0 0 15px}.faq details{border-top:1px solid var(--line);padding:13px 0}.faq details:last-child{border-bottom:1px solid var(--line)}.faq summary{cursor:pointer;font-weight:700;font-size:14px}.faq p{font-size:13px;color:#628086;line-height:1.85;margin:10px 0 2px}
 .lesson-video{margin-bottom:18px}.lesson-video .video-shell{aspect-ratio:16/9}.lesson-video .video-shell video{max-height:none;height:100%;object-fit:contain}
 @media(max-width:1180px){.lesson-support{grid-template-columns:1fr}}
+.rebuild-notice{background:#fff1d9;color:#74552b;padding:9px 24px;text-align:center;font-size:13px;line-height:1.5}.rebuild-notice strong{color:#69441b}
