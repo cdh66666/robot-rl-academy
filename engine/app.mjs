@@ -1,7 +1,15 @@
 const $ = id => document.getElementById(id);
 const elements = ['start','pause','reset','random-mode','trained-mode','force','test','export'];
 const lab = window.__rlLab = {ready:false, status:null, test:null, error:null};
-let worker, previousBestAt = -1, currentMode = 'random';
+let worker, previousBestAt = -1, currentMode = 'random', exportUrl = null;
+
+function clearExport() {
+  if (exportUrl) URL.revokeObjectURL(exportUrl);
+  exportUrl = null;
+  $('export-fallback').hidden = true;
+  $('export-link').removeAttribute('href');
+  $('export-text').value = '';
+}
 
 function clearResults(message = '独立测试只衡量这个模拟任务，分数不等于机器人能在真实世界运行。') {
   $('random-result').textContent = '—'; $('trained-result').textContent = '—';
@@ -93,8 +101,12 @@ function init() {
         lab.test=m;$('random-result').textContent=m.random.mean.toFixed(1);$('trained-result').textContent=m.trained.mean.toFixed(1);
         $('test-note').textContent=`测试推力 ${m.force} N；最佳策略来自 ${m.bestAt.toLocaleString()} 次决策的检查点。20 回合成绩范围：${m.trained.min}–${m.trained.max} 步。仅为模拟结果。`;
       } else if(m.type==='exportResult'){
-        const blob=new Blob([JSON.stringify(m.payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-        a.href=url;a.download='mujoco-cartpole-dqn-experiment.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+        const content=JSON.stringify(m.payload,null,2);
+        if (exportUrl) URL.revokeObjectURL(exportUrl);
+        exportUrl=URL.createObjectURL(new Blob([content],{type:'application/json'}));
+        const link=$('export-link');link.href=exportUrl;
+        $('export-text').value=content;$('export-fallback').hidden=false;
+        link.click();
       } else if(m.type==='error'){
         lab.error=m.message;$('load-status').className='notice error';$('load-status').textContent='训练出错：'+m.message;for(const id of elements)$(id).disabled=true;
       }
@@ -102,13 +114,18 @@ function init() {
     worker.postMessage({type:'init',seed:Number($('seed').value),penalty:Number($('penalty').value)});
   } catch(error) {$('load-status').className='notice error';$('load-status').textContent='浏览器无法启动训练：'+error;lab.error=String(error)}
 }
-$('start').onclick=()=>worker.postMessage({type:'start'});
+$('start').onclick=()=>{clearExport();worker.postMessage({type:'start'});};
 $('pause').onclick=()=>worker.postMessage({type:'pause'});
-$('reset').onclick=()=>worker.postMessage({type:'reset',seed:Number($('seed').value),penalty:Number($('penalty').value)});
+$('reset').onclick=()=>{clearExport();worker.postMessage({type:'reset',seed:Number($('seed').value),penalty:Number($('penalty').value)});};
 for(const [id,mode] of [['random-mode','random'],['trained-mode','trained']]){
   $(id).onclick=()=>{currentMode=mode;worker.postMessage({type:'mode',mode});$('random-mode').classList.toggle('active',mode==='random');$('trained-mode').classList.toggle('active',mode==='trained');$('play-label').textContent=mode==='random'?'随机动作':lab.status?.bestAt?'最佳策略':'未训练网络'};
 }
 $('force').oninput=e=>{$('force-value').textContent=e.target.value;worker.postMessage({type:'force',force:Number(e.target.value)});clearResults('推力已改变，请重新运行独立测试。')};
 $('test').onclick=()=>{$('test-note').textContent='正在运行 20 回合独立测试…';worker.postMessage({type:'test'})};
 $('export').onclick=()=>worker.postMessage({type:'export'});
+$('copy-export').onclick=async()=>{
+  try { await navigator.clipboard.writeText($('export-text').value); $('copy-export').textContent='已复制'; }
+  catch { $('export-text').focus();$('export-text').select();$('copy-export').textContent='请手动复制'; }
+};
+window.addEventListener('pagehide',()=>{if(exportUrl) URL.revokeObjectURL(exportUrl);});
 drawChart([]);init();
