@@ -1,0 +1,5 @@
+gymnasium[mujoco]==1.4.0
+mujoco==4.0.1
+stable-baselines3==2.9.2
+onnx==1.21.0
+onnxruntime==1.26.0

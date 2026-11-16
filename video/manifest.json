@@ -1,0 +1,104 @@
+{
+  "videos": [
+    {
+      "id": "01",
+      "title": "让机器人学会：从零到部署全景",
+      "file": "output/01.mp4",
+      "subtitle": "output/01.srt",
+      "cover": "output/01-cover.png",
+      "chapters": "output/01-chapters.txt",
+      "duration_seconds": 173.45,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "02",
+      "title": "状态、动作、奖励：一次互动发生了什么",
+      "file": "output/02.mp4",
+      "subtitle": "output/02.srt",
+      "cover": "output/02-cover.png",
+      "chapters": "output/02-chapters.txt",
+      "duration_seconds": 176.16,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "03",
+      "title": "神经网络与 DQN：策略是怎么学出来的",
+      "file": "output/03.mp4",
+      "subtitle": "output/03.srt",
+      "cover": "output/03-cover.png",
+      "chapters": "output/03-chapters.txt",
+      "duration_seconds": 236.4,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "04",
+      "title": "开始训练：读懂曲线，检验效果",
+      "file": "output/04.mp4",
+      "subtitle": "output/04.srt",
+      "cover": "output/04-cover.png",
+      "chapters": "output/04-chapters.txt",
+      "duration_seconds": 181.62,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "05",
+      "title": "MuJoCo 4：把机器人变成可训练的世界",
+      "file": "output/05.mp4",
+      "subtitle": "output/05.srt",
+      "cover": "output/05-cover.png",
+      "chapters": "output/05-chapters.txt",
+      "duration_seconds": 181.71,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "06",
+      "title": "奖励与失败：让进步真的有意义",
+      "file": "output/06.mp4",
+      "subtitle": "output/06.srt",
+      "cover": "output/06-cover.png",
+      "chapters": "output/06-chapters.txt",
+      "duration_seconds": 172.23,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "07",
+      "title": "电机与辨识：把硬件差异放进模型",
+      "file": "output/07.mp4",
+      "subtitle": "output/07.srt",
+      "cover": "output/07-cover.png",
+      "chapters": "output/07-chapters.txt",
+      "duration_seconds": 235.61,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "08",
+      "title": "仿真到现实：随机化不是万能药",
+      "file": "output/08.mp4",
+      "subtitle": "output/08.srt",
+      "cover": "output/08-cover.png",
+      "chapters": "output/08-chapters.txt",
+      "duration_seconds": 180.03,
+      "uses_real_browser_video": true
+    },
+    {
+      "id": "09",
+      "title": "部署与换主控：谁负责决策，谁负责执行",
+      "file": "output/09.mp4",
+      "subtitle": "output/09.srt",
+      "cover": "output/09-cover.png",
+      "chapters": "output/09-chapters.txt",
+      "duration_seconds": 181.01,
+      "uses_real_browser_video": false
+    },
+    {
+      "id": "10",
+      "title": "完整实战：从仿真训练到真机验证路线",
+      "file": "output/10.mp4",
+      "subtitle": "output/10.srt",
+      "cover": "output/10-cover.png",
+      "chapters": "output/10-chapters.txt",
+      "duration_seconds": 389.6,
+      "uses_real_browser_video": false
+    }
+  ]
+}

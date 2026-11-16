@@ -1,0 +1,9 @@
+{
+  "inputs": "float32 observation [batch,4]",
+  "outputs": "float32 clipped action [batch,1]",
+  "samples": 100,
+  "max_abs_action_difference": 1.7881393432617188e-07,
+  "tolerance": 1e-05,
+  "passed": true,
+  "warning": "This validates numerical inference only, not a hardware deployment."
+}

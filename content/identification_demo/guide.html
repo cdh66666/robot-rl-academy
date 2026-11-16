@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>系统辨识离线练习 | 机器人 RL 实验室</title><link rel="stylesheet" href="../../project/guide.css"></head>
+<body><header class="top"><a href="../../#resources">← 返回机器人 RL 实验室</a></header><main class="paper"><h1>系统辨识离线小练习：从曲线找响应速度与有效延迟</h1>
+<p>本练习完全不连接硬件。它先<strong>人工合成</strong>一段“目标位置 → 响应位置”数据，再只使用前半段估计一个简化的一阶模型，用后半段做留出验证。运行只需 Python 3.9 或更高版本及其标准库，不需要安装科学计算包或联网。</p>
+<p>这里的合成数据、目标角度、时间常数、噪声和结果都<strong>不是任何真实电机的测量值</strong>。这只是让你亲手理解辨识的流程，不意味着真实舵机一定符合一阶模型。</p>
+<h2>1. 运行</h2>
+<p>进入本目录，在终端执行：</p>
+<pre><code class="language-powershell">python identify_demo.py
+</code></pre>
+<p>脚本自动生成三份输出，重复运行会重写本练习的输出：</p>
+<ul>
+<li><code>output/synthetic_servo_response.csv</code>：时间、目标角和合成测量角。每一行的 <code>data_kind</code> 都标为 <code>synthetic</code>。</li>
+<li><code>output/identification_report.json</code>：本次运行的已知合成参数、拟合结果、训练和留出验证误差。</li>
+<li><code>output/response_fit.svg</code>：目标、合成测量和模型预测曲线，直接用浏览器打开。</li>
+</ul>
+<p>不想先运行代码，可先打开附带的 <a href="output/response_fit.svg">一次运行结果图</a> 和 <a href="output/identification_report.json">原始数值记录</a>，再自行运行并比较结果。</p>
+<h2>2. 在学什么、为什么、能看到什么</h2>
+<p>现实舵机接收目标位置后通常不会瞬间到达，响应快慢与延迟会影响控制。这个例子用一个很简单的数学模型演示：</p>
+<pre><code class="language-text">y[k+1] = y[k] + (1 - exp(-dt / tau)) × (u[k - d] - y[k])
+</code></pre>
+<ul>
+<li><code>u</code> 是命令目标位置，<code>y</code> 是预测的位置，单位均为 rad；<code>dt</code> 是采样周期。</li>
+<li><code>tau</code> 是这个简化模型的时间常数。对于没有额外延迟、从零开始的一阶阶跃响应，经过一个时间常数后，理论上会完成约 63% 的变化。</li>
+<li><code>d</code> 是以采样步数表示的<strong>拟合有效延迟</strong>，并不天然等于某个设备的纯通信延迟。</li>
+</ul>
+<p>课程脚本假设每 20 ms 取样一次，人工合成 20 秒数据；设定的生成参数为 <code>tau = 0.24 s</code>、有效延迟 <code>0.16 s</code>，再添加标准差 <code>0.003 rad</code> 的随机测量噪声。输入包含多个变化，让模型需要解释不止一次阶跃。</p>
+<h2>3. 拟合与独立验证</h2>
+<ol>
+<li>将 <code>0–11.98 s</code> 分给拟合，<code>12.00–20.00 s</code> 保留验证。</li>
+<li>在预先给定的候选网格搜索 <code>tau</code> 和延迟；比较拟合段的预测和测量，选 RMSE 最低的一组。延迟网格分辨率是一个采样周期，即 20 ms；超出网格的参数不能被正确搜索到。</li>
+<li>留出验证段的第一个位置只作为模型初始状态，之后利用目标命令和已选参数<strong>开环预测</strong>，不再用后续测量点修正，也不使用验证段调整参数。</li>
+<li>对 12.02–20.00 秒的预测与合成测量计算 RMSE、平均绝对误差和最大绝对误差。在图里对照橙色目标、灰色合成测量和蓝绿色预测。</li>
+</ol>
+<p>图中右半部分是留出验证段。这个案例的生成模型与拟合模型刻意相同，而且真实参数恰好落在搜索网格上，因此拟合很好是合理预期，不能据此推断真实舵机也能这么准确。验证只说明此合成例子在这批留出输入上的表现。</p>
+<h2>4. 一次实际运行的记录</h2>
+<p>2026-11-16，在本工作区运行脚本，随机种子 <code>20261116</code>：</p>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>合成时设定的时间常数</td>
+  <td>0.240 s</td>
+</tr>
+<tr>
+  <td>估计时间常数</td>
+  <td>0.240 s</td>
+</tr>
+<tr>
+  <td>合成时设定的有效延迟</td>
+  <td>0.160 s</td>
+</tr>
+<tr>
+  <td>估计有效延迟</td>
+  <td>0.160 s</td>
+</tr>
+<tr>
+  <td>拟合段 RMSE</td>
+  <td>0.002817 rad</td>
+</tr>
+<tr>
+  <td>留出验证段 RMSE</td>
+  <td>0.002740 rad</td>
+</tr>
+<tr>
+  <td>留出验证段平均绝对误差</td>
+  <td>0.002192 rad</td>
+</tr>
+</tbody>
+</table>
+<p>这是对<strong>程序合成数据</strong>的一次运行记录。不同数据或模型会得到不同结果，以上数值不是电机参数或硬件性能保证。</p>
+<h2>5. 迁移到真实设备前要补什么</h2>
+<ul>
+<li>先确认设备型号、控制模式、运动边界、机械支撑、急停和厂商限制，再由现场操作者设计可控测试；本例不会连接或控制电机。</li>
+<li>记录命令和反馈各自的时间戳、位置与单位，确认时钟同步、采样周期、通信超时和状态。传感器或电机不提供的数据留空并标“不支持/未测”，不要写成零。</li>
+<li>本例的有效延迟可能综合了采样、传感器滤波、通信、驱动器内部处理及执行器动态。<strong>不能把它直接当成纯通信时延</strong>；要识别各部分，需要额外测量和合适的实验设计。</li>
+<li>实机可能有方向相关摩擦、饱和、死区、回差、负载变化和非线性；先检查残差及不同方向/负载的留出数据，模型不合适时换模型，而不是强行使用一阶模型。</li>
+<li>可把本例的 CSV、拟合方法和自己的真实数据描述交给 AI，请其根据硬件和数据格式生成只读分析程序。保留原始记录，验证时明确时间分组、处理流程与未覆盖的工况。</li>
+</ul>
+<p>进一步填写课程 <a href="../guide.html">真实机器人实战工作手册</a> 的系统辨识记录表。背景资料：<a href="https://mujoco.readthedocs.io/en/latest/modeling.html">MuJoCo 建模文档</a>、<a href="https://arxiv.org/abs/1804.10332">机器人仿真到现实研究</a>。</p>
+</main></body></html>

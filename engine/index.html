@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>MuJoCo 倒立摆训练实验室</title>
+  <link rel="stylesheet" href="./lab.css">
+</head>
+<body>
+<main class="lab">
+  <header class="lab-header">
+    <div>
+      <p class="eyebrow"><span class="pulse"></span> INTERACTIVE LAB · 01</p>
+      <h1>让倒立摆自己学会平衡</h1>
+      <p class="intro">一根会倒下的杆，一辆只能左右推的小车。按下训练，观察一张神经网络如何从试错中找到平衡。</p>
+    </div>
+    <div class="engine-tag"><span>真实物理引擎</span><strong>MuJoCo 4.0.1</strong><small>浏览器本地训练 · 2D 投影</small></div>
+  </header>
+  <div class="notice" id="load-status" role="status">正在加载 MuJoCo 物理引擎…</div>
+  <section class="grid">
+    <div class="stage panel">
+      <div class="panel-heading"><div><span class="overline">01 / OBSERVE</span><h2>先看它怎么动</h2></div><span class="live" id="play-label">随机动作</span></div>
+      <div class="world"><canvas id="world" width="900" height="430" aria-label="MuJoCo 倒立摆模拟画面"></canvas><div class="world-result" id="frame-result" hidden></div><div class="world-caption"><span>20 ms / 决策步</span><span>物理模拟 · 非实机</span></div></div>
+      <div class="switcher" role="group" aria-label="选择观察的策略">
+        <button class="switch active" id="random-mode" disabled>随机动作</button><button class="switch" id="trained-mode" disabled>观察最佳策略</button>
+      </div>
+      <div class="telemetry"><span>位置 <strong id="pos">—</strong> m</span><span>速度 <strong id="velocity">—</strong> m/s</span><span>倾角 <strong id="angle">—</strong>°</span><span>角速度 <strong id="angular-velocity">—</strong>°/s</span><span>动作 <strong id="action">—</strong></span><span>本回合 <strong id="frame-step">—</strong> 步</span></div>
+    </div>
+    <div class="train panel">
+      <div class="panel-heading"><div><span class="overline">02 / TRAIN</span><h2>开始真实训练</h2></div><span class="algorithm">DOUBLE DQN</span></div>
+      <p>每个决策步得 <b>+1 分</b>。倾角超过 ±12° 或位置超出 ±2.4 m 时失败，额外 <b id="penalty-label">−5 分</b>。神经网络根据经验更新左右推的价值。</p>
+      <div class="form-row"><label for="seed">随机种子 <small>更改后需重新开始</small></label><input id="seed" type="number" min="1" max="4294967295" value="123" inputmode="numeric"></div>
+      <div class="form-row"><label for="penalty">失败额外奖励 <small>更改后需重新开始</small></label><select id="penalty"><option value="-5" selected>−5（推荐）</option><option value="0">0（仅存活奖励）</option></select></div>
+      <div class="controls"><button id="start" class="primary" disabled>开始训练</button><button id="pause" class="secondary" disabled>暂停</button><button id="reset" class="secondary" disabled>重新开始</button></div>
+      <div class="progress"><div id="progress-bar"></div></div><div class="progress-caption"><span id="progress-text">0 / 50,000 次决策</span><span id="train-state">准备中</span></div>
+      <div class="metrics"><div><span>训练回合</span><strong id="episodes">0</strong></div><div><span>探索率 ε</span><strong id="epsilon">—</strong></div><div><span>近 20 回合平均</span><strong id="recent">—</strong><small>存活步数</small></div></div>
+      <p class="fine">训练在你的浏览器里运行，不上传数据；关闭页面后不会自动保存。每次训练至多 50,000 次决策，结果会因种子与参数波动。</p>
+    </div>
+    <div class="chart panel">
+      <div class="panel-heading"><div><span class="overline">03 / CHECK</span><h2>它真的学会了吗？</h2></div><div class="best">最佳检查点 <strong id="best">—</strong><span> / 500 步</span></div></div>
+      <p>每 5,000 次决策，用固定的 10 组初始条件检验当前网络，保留得分最高的检查点。折线变差不代表数据坏了，训练本来就会波动。</p>
+      <canvas id="chart" width="900" height="270" aria-label="训练过程中验证分数变化图"></canvas>
+      <div class="graph-footer"><span>0 步</span><span>训练决策次数 →</span><span>50,000 步</span></div>
+    </div>
+    <div class="test panel">
+      <div class="panel-heading"><div><span class="overline">04 / TEST</span><h2>换一组条件试试</h2></div><span class="algorithm">SIM → SIM</span></div>
+      <p>用训练检查未使用过的 20 组初始条件分别测试随机策略和最佳策略。改变推力，体验仿真参数与实际不一致时可能出现的性能变化。</p>
+      <div class="slider-heading"><label for="force">观察和独立测试推力</label><strong><span id="force-value">10</span> N</strong></div>
+      <input id="force" type="range" min="6" max="14" value="10" step="1" disabled>
+      <div class="slider-ends"><span>6 N 较弱</span><span>训练时固定 10 N</span><span>14 N 较强</span></div>
+      <button class="outline" id="test" disabled>运行 20 回合独立测试</button>
+      <div class="test-results"><div><span>随机动作平均</span><strong id="random-result">—</strong><small>步 / 500</small></div><div><span id="network-result-label">未训练网络平均</span><strong id="trained-result">—</strong><small>步 / 500</small></div></div>
+      <p class="fine" id="test-note">独立测试只衡量这个模拟任务，分数不等于机器人能在真实世界运行。</p>
+      <button class="text-button" id="export" disabled>↓ 下载本次实验记录与策略 JSON</button>
+    </div>
+  </section>
+  <section class="explain panel">
+    <div><span class="overline">拆开这个闭环</span><h2>四个量进来，一个动作出去</h2></div>
+    <div class="flow"><div><b>状态 s</b><span>位置 · 速度<br>角度 · 角速度</span></div><i>→</i><div><b>神经网络 Q</b><span>估计左推 / 右推<br>各自的长期价值</span></div><i>→</i><div><b>动作 a</b><span>选左推或右推<br>作用到 MuJoCo</span></div><i>→</i><div><b>奖励 r</b><span>存活 +1<br>倒下额外扣分</span></div><i>↻</i><div><b>更新参数</b><span>从经验回放池<br>抽样学习</span></div></div>
+    <p class="fine">这里用离散动作 Double DQN 演示深度强化学习；连续关节控制常用 PPO 等其他算法。每回合最多 500 步是时间截断，不视为跌倒终止。物理模型是教学用倒立摆，并非真实机器人或官方 Gymnasium 环境的逐项复刻。</p>
+    <a href="https://github.com/google-deepmind/mujoco/tree/main/wasm" target="_blank" rel="noopener">MuJoCo 官方 JavaScript / WASM 文档 ↗</a>
+  </section>
+</main>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>

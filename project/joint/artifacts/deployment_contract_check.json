@@ -1,0 +1,16 @@
+{
+  "simulation_episodes": 10,
+  "control_samples": 1500,
+  "max_observation_difference": 2.4139881134033203e-06,
+  "max_action_difference": 3.94284725189209e-05,
+  "max_reference_difference_rad": 2.1725893021296017e-06,
+  "tolerances": {
+    "observation": 1e-05,
+    "action": 0.0001,
+    "reference_rad": 1e-05
+  },
+  "rejected_invalid_samples": 3,
+  "expected_rejections": 3,
+  "passed": true,
+  "hardware_connected": false
+}

@@ -1,0 +1,1 @@
+session_id,sample_time_monotonic_ms,command_time_ms,feedback_time_ms,joint_name,device_id,mode,command_value,command_unit,position_raw,position_rad,velocity_rad_s,measured_current_A,bus_voltage_V,temperature_C,feedback_age_ms,device_error,limit_flag,note

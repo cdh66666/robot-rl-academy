@@ -1,0 +1,7 @@
+{
+  "samples": 101,
+  "max_absolute_error": 7.152557373046875e-07,
+  "clip_inside_model": true,
+  "observation_dtype": "float32",
+  "note": "simulation policy only; hardware deployment not tested"
+}

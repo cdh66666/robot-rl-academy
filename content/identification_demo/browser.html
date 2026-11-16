@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>辨识实验｜机器人 RL 实验室</title>
+  <link rel="stylesheet" href="../../project/guide.css">
+  <link rel="stylesheet" href="browser.css">
+  <script defer src="browser.js"></script>
+</head>
+<body>
+  <header class="top"><a href="../../#lesson/07">← 返回第 7 课</a></header>
+  <main class="experiment">
+    <div class="heading"><div><span class="kicker">动手实验 02</span><h1>从响应曲线，找出模型参数</h1><p>观察位置指令与响应；只用前 12 秒拟合，再看后 8 秒能不能预测。整个过程在浏览器里完成。</p></div><span class="badge">合成数据 · 非真实电机</span></div>
+    <div class="notice"><strong>这组数据是程序生成的。</strong>生成模型和拟合模型刻意一致，参数也落在搜索范围内。效果好只说明这个练习能够运行，不能代表真实舵机或无刷电机的性能。</div>
+    <div class="layout"><section class="graph-card">
+      <div class="graph-top"><div><span class="kicker">目标和响应</span><h2>先看数据，再做拟合</h2></div><span id="data-status" role="status">正在加载数据…</span></div>
+      <div class="legend"><span><i class="target"></i>目标位置</span><span><i class="measured"></i>合成测量</span><span><i class="prediction"></i>模型预测</span></div>
+      <canvas id="graph" width="1160" height="470" role="img" aria-label="合成伺服目标、测量和拟合曲线。前 12 秒为拟合段，后 8 秒为留出验证段。"></canvas>
+      <div class="axis-caption"><span>角度：rad</span><span>时间：秒</span></div>
+    </section><aside class="action-card">
+      <div class="kicker">三步完成</div><h2>训练一份简化模型</h2>
+      <ol><li><b>拟合</b><span>只看 0–11.98 秒数据，在候选网格中寻找时间常数与有效延迟。</span></li><li><b>留出验证</b><span>用 12 秒处的测量作为起点，再开环预测后续响应，不用后续测量调整参数。</span></li><li><b>检查误差</b><span>比较预测与合成测量，看看这个简化模型能否解释留出段。</span></li></ol>
+      <button id="fit" disabled>开始拟合与验证</button><p class="fine" id="fit-status" aria-live="polite">数据加载后即可开始。</p>
+      <div class="results" id="results" hidden><div><span>估计时间常数 τ</span><strong id="tau">—</strong></div><div><span>估计有效延迟</span><strong id="delay">—</strong></div><div><span>留出验证 RMSE</span><strong id="rmse">—</strong></div></div>
+      <p class="fine">有效延迟可能包含采样、滤波、通信和驱动响应，不能直接当作纯通信延迟。</p>
+    </aside></div>
+    <div class="next"><div><h2>接下来把方法带到真实硬件</h2><p>真实数据需要另行记录命令与反馈时间、单位和工况，并检验模型是否适用。未测量的参数不要填零。</p></div><div class="links"><a href="guide.html">阅读完整练习</a><a href="../identification_demo.zip" download>下载离线练习</a><a href="../guide.html">打开真实机器人手册</a></div></div>
+  </main>
+</body>
+</html>

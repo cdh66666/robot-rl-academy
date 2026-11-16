@@ -1,0 +1,16 @@
+{
+  "algorithm": "Stable-Baselines3 PPO",
+  "seed": 123,
+  "requested_timesteps": 100000,
+  "actual_timesteps": 100352,
+  "control_period_s": 0.02,
+  "obs": [
+    "q_rad/0.9",
+    "clip(qd_rad_s/5)",
+    "target_rad/0.9",
+    "previous_applied_position_reference_rad/0.9"
+  ],
+  "action": "clip(policy_output,-1,1) * 0.9 rad, with a +/-0.06 rad/cycle setpoint slew limit",
+  "physical_validation": "none: simulation only",
+  "model_xml_sha256": "88dc7ab3770901fe8faec4d03ef294419724202d3809ec93fbf7b9c3e3ded85b"
+}
