@@ -37,6 +37,13 @@ python -m venv .venv
 .\.venv\Scripts\python.exe plot_results.py --artifacts my_run
 </code></pre>
 <p><code>train.py</code> 默认用 CPU，PPO 以每次 512 步的批次收集数据，所以 <code>--timesteps 100000</code> 实际可执行到 100352 步。计算耗时随电脑而变。<code>deploy_offline.py</code> 只对人为给出的数字做一次推理并打印结果，没有通信端口、驱动调用或真实输出。训练配置、策略和评估结果位于输出目录；<code>my_run</code> 是用户自己生成的新目录。</p>
+<h2>第 09 集：不用先训练，直接验证随包策略</h2>
+<p>完成上面的安装后，即使还没有 <code>my_run</code>，也可以使用随包策略完成导出与离线检查。以下结果写入新的 <code>exported_check</code>，不会覆盖 <code>artifacts</code> 原始文件。如果 <code>exported_check</code> 已有要保留的同名结果，先把下面三个命令中的输出目录统一改成另一个名字；重复运行会覆盖该输出目录下的同名结果。</p>
+<pre><code class="language-powershell">.\.venv\Scripts\python.exe export_onnx.py --model artifacts\joint_ppo.zip --output exported_check
+.\.venv\Scripts\python.exe check_deployment.py --artifacts exported_check --model artifacts\joint_ppo.zip
+.\.venv\Scripts\python.exe deploy_offline.py --model exported_check\joint_actor.onnx
+</code></pre>
+<p>第二条命令必须指定生成 ONNX 所用的同一份 SB3 策略，比较的结果与路径保存在 <code>exported_check\deployment_contract_check.json</code>。若使用自己重新训练的策略，请将导出、对照与离线推理路径一起改为对应的文件。省略 <code>--model</code> 时，契约检查仍默认读取 <code>--artifacts</code> 目录里的 <code>joint_ppo.zip</code>，所以前面的 <code>my_run</code> 旧命令也可继续使用。</p>
 <p><code>inspect_model.py</code> 会从零角度分别在两个独立仿真中请求 <code>+0.4</code> 和 <code>−0.4 rad</code> 位置参考，各运行 20 个控制周期；显示模型时间步、输入和力矩范围、参考的单周期最大变化、正负方向的最终角度，并将每个控制周期的样本写入你指定的 JSON。在本机默认模型一次运行中，首周期应用参考为 ±0.06 rad，20 周期后的角度约 ±0.37256 rad；每个物理步采样到的执行器力矩绝对值峰值约 0.661 N·m，低于该模拟模型的 ±1.5 N·m 限制。你的结果可能因环境不同而略有差异；这只检查两个模拟输入，不能证明真实机器人方向、标定、力矩或安全。</p>
 <p>本机验证环境为 Windows 64 位、Python 3.13.12、Gymnasium 1.4.0、MuJoCo 4.0.1、Stable-Baselines3 2.9.2、PyTorch 2.12.0（训练指定 CPU）、ONNX 1.21.0 和 ONNX Runtime 1.26.0。2026-11-16 已在不继承系统包的新虚拟环境里，按本包 <code>requirements.txt</code> 安装并从解压包完成训练、评估、导出及离线接口检查；这次使用了本机配置的 Python 包镜像。其他系统、网络或后续依赖供应可能产生不同结果。</p>
 <h2>参数与输入输出契约</h2>

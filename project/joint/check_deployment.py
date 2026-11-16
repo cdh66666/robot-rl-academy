@@ -13,10 +13,13 @@ from joint_env import HERE, JointReachEnv
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifacts", type=Path, default=Path("artifacts"))
+    parser.add_argument("--model", type=Path, default=None,
+                        help="SB3 policy to compare; defaults to <artifacts>/joint_ppo.zip")
     parser.add_argument("--xml", type=Path, default=HERE / "model.xml")
     args = parser.parse_args()
     torch.set_num_threads(1)
-    model = PPO.load(args.artifacts/"joint_ppo.zip", device="cpu")
+    model_path = args.model if args.model is not None else args.artifacts/"joint_ppo.zip"
+    model = PPO.load(model_path, device="cpu")
     adapter = OfflineJointPolicy(args.artifacts/"joint_actor.onnx")
     env = JointReachEnv(args.xml)
     max_action_diff = max_ref_diff = max_obs_diff = 0.0
@@ -43,7 +46,8 @@ def main():
             adapter.infer(**sample)
         except ValueError:
             reject_count += 1
-    result = {"simulation_episodes":10, "control_samples":samples,
+    result = {"model_source":str(model_path), "onnx_source":str(args.artifacts/"joint_actor.onnx"),
+              "simulation_episodes":10, "control_samples":samples,
               "max_observation_difference":max_obs_diff, "max_action_difference":max_action_diff,
               "max_reference_difference_rad":max_ref_diff,
               "tolerances":{"observation":1e-5, "action":1e-4, "reference_rad":1e-5},

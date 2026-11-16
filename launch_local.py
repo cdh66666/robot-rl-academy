@@ -7,7 +7,10 @@ import webbrowser
 from pathlib import Path
 from http_range import RangeRequestHandler
 
-ROOT = Path(__file__).resolve().parent
+BASE = Path(__file__).resolve().parent
+# After the complete long-course build, serve that reviewed staging tree.
+# Before then the existing short course remains available as a marked preview.
+ROOT = BASE / "publish" if (BASE / "publish" / ".v2-release").is_file() else BASE
 
 
 def is_our_site(port):
