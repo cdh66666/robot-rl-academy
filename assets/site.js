@@ -55,17 +55,31 @@
     const practices = (lesson.practice || []).map(x => `<li>${esc(x)}</li>`).join("");
     const checks = (lesson.check || []).map(item => {const c=splitCheck(item);return `<details><summary>${esc(c.q)}</summary><p>${esc(c.a)}</p></details>`;}).join("");
     const sources = (lesson.sources || []).map(s => `<li><a href="${esc(externalUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a></li>`).join("");
+    const chapters = (lesson.chapters || []).map((chapter,i) => {
+      const sec = Number(chapter.start_seconds || 0), minute = Math.floor(sec / 60), second = Math.floor(sec % 60);
+      const stamp = `${String(minute).padStart(2,'0')}:${String(second).padStart(2,'0')}`;
+      const transcript = String(chapter.narration || '').split(/\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('');
+      const references = (chapter.source_urls || []).map((url,n) => `<a href="${esc(externalUrl(url))}" target="_blank" rel="noopener noreferrer">资料 ${n+1} ↗</a>`).join('　');
+      return `<details class="chapter"><summary><span class="chapter-number">${String(i+1).padStart(2,'0')}</span><span>${esc(chapter.title)}</span><span class="chapter-time">${stamp}</span></summary><div class="chapter-content"><p><strong>跟着做：</strong>${esc(chapter.practice)}</p><p><strong>预期结果：</strong>${esc(chapter.expected)}</p><button type="button" class="small-button jump-video" data-seconds="${sec}">从 ${stamp} 开始观看</button><details class="transcript"><summary>展开本章讲解文字</summary>${transcript}</details>${references ? `<p class="chapter-references">${references}</p>` : ''}</div></details>`;
+    }).join('');
     const done = state.done.includes(id);
     $("#lesson-content").innerHTML = `
       <div class="lesson-head"><div class="lesson-crumb"><a href="#start">学习路线</a> / 第 ${esc(id)} 课</div><span class="section-tag">${esc(lesson.duration || "动手学习")}</span><h1>${esc(lesson.title)}</h1><p class="why">${esc(lesson.why)}</p><div class="lesson-meta"><span class="pill">学完后动手做</span><span>看视频 · 读重点 · 做练习</span></div></div>
       <div class="lesson-body"><div class="outcome"><div><h2>这一课学什么</h2><p>${esc(lesson.objective)}</p></div><div><h2>学完能做什么</h2><p>${esc(lesson.outcome)}</p></div></div><article class="content-card lesson-video"><div class="card-label">本课视频</div>${videoHtml(lesson)}</article>
-      <div class="lesson-grid"><div class="lesson-text"><article class="content-card"><div class="card-label">核心内容</div>${blocks}</article><article class="content-card"><div class="card-label">亲手试一试</div><h2>按照这几步做</h2><ol class="practice-list">${practices}</ol><div class="lesson-actions"><a class="button secondary" href="#lab">打开训练实验室</a>${index >= 6 ? '<a class="button secondary" href="#robot">填写机器人接口表</a>' : ""}${id === "07" ? '<a class="button secondary" href="content/identification_demo/browser.html" target="_blank">打开网页辨识实验</a>' : ""}${id === "10" ? '<a class="button secondary" href="project/joint/guide.html" target="_blank">打开单关节实战</a>' : ""}</div></article><article class="content-card"><div class="card-label">检查是否理解</div><h2>试着自己回答</h2>${checks}</article></div>
+      <div class="lesson-grid"><div class="lesson-text"><article class="content-card"><div class="card-label">核心内容</div>${blocks}</article>${chapters ? `<article class="content-card"><div class="card-label">章节与跟练</div><h2>按步骤学，每一章都能动手</h2><p>展开章节查看操作、预期结果和讲解文字；也可以跳到对应视频位置。</p>${chapters}</article>` : ''}<article class="content-card"><div class="card-label">亲手试一试</div><h2>按照这几步做</h2><ol class="practice-list">${practices}</ol><div class="lesson-actions"><a class="button secondary" href="#lab">打开训练实验室</a>${index >= 6 ? '<a class="button secondary" href="#robot">填写机器人接口表</a>' : ""}${id === "07" ? '<a class="button secondary" href="content/identification_demo/browser.html" target="_blank">打开网页辨识实验</a>' : ""}${id === "10" ? '<a class="button secondary" href="project/joint/guide.html" target="_blank">打开单关节实战</a>' : ""}</div></article><article class="content-card"><div class="card-label">检查是否理解</div><h2>试着自己回答</h2>${checks}</article></div>
       <aside class="lesson-support"><article class="content-card"><div class="card-label">继续查证</div><h2>本课资料</h2><ul class="source-list">${sources}</ul></article></aside></div>
       <div class="lesson-actions"><button class="button ${done ? "secondary" : "primary"}" id="mark-done" data-id="${esc(id)}">${done ? "✓ 已标记完成" : "标记本课完成"}</button>${previous ? `<a class="button ghost" href="${lessonUrl(String(previous.id).padStart(2,"0"))}">上一课</a>` : ""}${next ? `<a class="button ghost next" href="${lessonUrl(String(next.id).padStart(2,"0"))}">下一课：${esc(next.title)} ↗</a>` : '<a class="button ghost next" href="#robot">整理你的机器人项目 ↗</a>'}</div></div>`;
     $("#mark-done")?.addEventListener("click", () => {
       state.done = done ? state.done.filter(x => x !== id) : [...new Set([...state.done,id])];
       writeJson("robot-rl-done",state.done); renderLesson(id); updateNavigation(id);
     });
+    $$('.jump-video', $('#lesson-content')).forEach(button => button.addEventListener('click', () => {
+      const video = $('#lesson-content video');
+      if (!video) return;
+      video.currentTime = Number(button.dataset.seconds || 0);
+      video.scrollIntoView({behavior:'smooth',block:'center'});
+      video.play().catch(() => {});
+    }));
   }
   function route() {
     let route = location.hash.slice(1) || "start";

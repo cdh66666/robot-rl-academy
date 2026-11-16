@@ -13,19 +13,31 @@
 
 ## 1. 建立环境
 
-本项目在 Windows、Python 3.13、MuJoCo 4.0.1、Gymnasium 1.4.0 和 Stable-Baselines3 2.9.2 上做过仿真验证。首次安装需要联网；CPU 即可运行。打开终端并进入本目录，Windows PowerShell 示例：
+下面以 Windows 10/11、64 位电脑和 PowerShell 为例。网页实验不需要安装；只有从这里开始运行 Python 进阶工程时才需要以下准备。首次安装依赖需要联网和一定的磁盘空间；本例用 CPU，不要求 NVIDIA 显卡。
+
+1. 在课程网站的“参考资料”中下载“实战代码”，在下载的 ZIP 上点击右键，选择“全部解压”。逐层打开解压后的 `robot-rl-ppo/project/`，直到同一窗口里能看到 `train_ppo.py` 和 `requirements.txt`。不要直接在 ZIP 压缩包内部运行。
+2. 在这个文件夹的地址栏输入 `powershell` 并回车。新窗口打开后执行下面两行：第一行显示当前目录，第二行应显示 `True`。若显示 `False`，说明终端没有打开在上一步的文件夹里，重新按上一步操作。
+
+```powershell
+Get-Location
+Test-Path .\train_ppo.py
+```
+
+3. 在同一窗口执行 `python --version`。建议使用 **64 位 Python 3.13**；本课程在 Windows、Python 3.13.12 上测试过。若没有 Python，可从 [Python 3.13 官方 Windows 下载页](https://www.python.org/downloads/windows/)选择 Python 3.13 的 **Windows installer (64-bit)**；安装时勾选“Add Python to PATH”，完成后关闭并重新打开 PowerShell，再运行 `python --version`。若系统已有多个 Python 版本，确认本窗口实际显示 `Python 3.13.x`；不要把其他版本当作已经验证过。
+4. 创建只属于本项目的虚拟环境并安装依赖。第一条成功后会在当前文件夹出现 `.venv`；第二条需要下载依赖，结束时应看到 `Successfully installed` 或已满足依赖的提示。下面直接调用虚拟环境中的 Python，**无需激活环境，也无需修改 PowerShell 执行策略**。
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip check
 ```
 
-macOS/Linux 可以改用 `.venv/bin/python`；具体平台与显卡配置可能影响安装与可视化。
+`pip check` 显示 `No broken requirements found` 表示依赖检查通过；下载失败或提示找不到文件时先核对网络和当前目录，不要继续训练。macOS/Linux 可以改用 `.venv/bin/python`；安装及图形窗口的表现可能不同，本教程的完整跟练以 Windows 64 位为例。
 
 ## 2. 训练并评估
 
 ```powershell
-.\.venv\Scripts\python train_ppo.py --steps 60000 --episodes 20
+.\.venv\Scripts\python.exe train_ppo.py --steps 60000 --episodes 20
 ```
 
 程序先用随机动作记录基线，再在仿真里训练 PPO，保存、重新加载策略，在与训练分开的 20 个初始条件下比较。SB3 按整批采样，实际交互步数可能略超过请求预算。运行时间和成绩取决于电脑、依赖与随机性；不保证每次完全相同或一定达到特定分数。
@@ -35,7 +47,7 @@ macOS/Linux 可以改用 `.venv/bin/python`；具体平台与显卡配置可能�
 ## 3. 观看仿真
 
 ```powershell
-.\.venv\Scripts\python watch_ppo.py
+.\.venv\Scripts\python.exe watch_ppo.py
 ```
 
 打开 MuJoCo 窗口后观察训练后的策略。若在无图形界面的服务器或远程环境运行，窗口可能不可用，但上一步的无窗口训练和评估仍可进行。
@@ -43,7 +55,7 @@ macOS/Linux 可以改用 `.venv/bin/python`；具体平台与显卡配置可能�
 ## 4. 导出与检查
 
 ```powershell
-.\.venv\Scripts\python export_onnx.py
+.\.venv\Scripts\python.exe export_onnx.py
 ```
 
 脚本把确定性 PPO 策略导出为 ONNX，并在 101 组输入上比较导出结果与 Stable-Baselines3 的 `predict`；数值偏差超出容差就报错。输出动作的限幅包含在 ONNX 内。

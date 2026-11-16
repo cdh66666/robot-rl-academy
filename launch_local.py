@@ -5,6 +5,7 @@ import threading
 import urllib.request
 import webbrowser
 from pathlib import Path
+from http_range import RangeRequestHandler
 
 ROOT = Path(__file__).resolve().parent
 
@@ -22,7 +23,7 @@ def main():
         if is_our_site(port):
             webbrowser.open(f"http://127.0.0.1:{port}/")
             return
-        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT))
+        handler = functools.partial(RangeRequestHandler, directory=str(ROOT))
         try:
             server = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
         except OSError:

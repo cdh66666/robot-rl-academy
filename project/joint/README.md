@@ -16,12 +16,21 @@
 
 ## 立即运行
 
-已包含训练好的 `artifacts/joint_ppo.zip` 与 `artifacts/joint_actor.onnx`，可以先评估，再独立重训。下面以 Windows PowerShell 和当前 `python` 命令为例，在此目录执行；本机实际验证的解释器为 Python 3.13.12。首次安装依赖需要网络，之后训练和评估不需要云服务或 API 密钥。
+已包含训练好的 `artifacts/joint_ppo.zip` 与 `artifacts/joint_actor.onnx`，可以先评估，再独立重训。下面以 Windows 10/11、64 位电脑和 PowerShell 为例；网页入门实验不需要安装，以下步骤只用于运行这个 Python 进阶工程。
+
+1. 在课程网站“参考资料”下载“单关节工程”，右键 ZIP 选择“全部解压”，逐层打开解压得到的 `单关节PPO` 文件夹，直到同一窗口能看到 `train.py`、`model.xml` 和 `requirements.txt`。若下载的是完整实战代码包，则进入其中的 `robot-rl-ppo/project/joint/`。
+2. 在该文件夹地址栏输入 `powershell` 后回车。在打开的窗口执行 `Get-Location` 查看当前位置，并执行 `Test-Path .\model.xml`；应返回 `True`。若为 `False`，请重新从包含 `model.xml` 的文件夹打开 PowerShell。
+3. 执行 `python --version`。建议使用 **64 位 Python 3.13**，本机实际测试为 Python 3.13.12；如果没有安装，可从 [Python 官方 Windows 下载页](https://www.python.org/downloads/windows/)选择 Python 3.13 的 **Windows installer (64-bit)**，安装时勾选“Add Python to PATH”。完成后重新打开 PowerShell，再确认显示 `Python 3.13.x`。首次安装依赖需要网络；训练和评估在本地 CPU 上运行，不需要云服务或 API 密钥。
+4. 在同一窗口按顺序运行下面的命令。`.venv` 是这个项目单独的依赖环境，直接调用其中的 Python 即可，不需要激活环境或修改 PowerShell 执行策略。安装结束后 `pip check` 应显示 `No broken requirements found`。
 
 ```powershell
 python --version
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip check
+
+# 只在仿真中检查正负参考、时间步和限幅，不覆盖随包结果
+.\.venv\Scripts\python.exe inspect_model.py --output first_check\model_inspection.json
 
 # 先复现随包模型的固定种子评估，查看零动作、未训练网络、PPO 和直接目标基线
 .\.venv\Scripts\python.exe evaluate.py --output first_check
@@ -37,7 +46,9 @@ python -m venv .venv
 
 `train.py` 默认用 CPU，PPO 以每次 512 步的批次收集数据，所以 `--timesteps 100000` 实际可执行到 100352 步。计算耗时随电脑而变。`deploy_offline.py` 只对人为给出的数字做一次推理并打印结果，没有通信端口、驱动调用或真实输出。训练配置、策略和评估结果位于输出目录；`my_run` 是用户自己生成的新目录。
 
-本机验证环境为 Python 3.13.12、Gymnasium 1.4.0、MuJoCo 4.0.1、Stable-Baselines3 2.9.2、PyTorch 2.12.0+cu126（训练指定 CPU）、ONNX 1.21.0 和 ONNX Runtime 1.26.0；不同系统的 PyTorch 构建及计算结果可能不同。本机环境继承了系统 Python 包；从头安装是否成功受平台与依赖包供应影响。
+`inspect_model.py` 会从零角度分别在两个独立仿真中请求 `+0.4` 和 `−0.4 rad` 位置参考，各运行 20 个控制周期；显示模型时间步、输入和力矩范围、参考的单周期最大变化、正负方向的最终角度，并将每个控制周期的样本写入你指定的 JSON。在本机默认模型一次运行中，首周期应用参考为 ±0.06 rad，20 周期后的角度约 ±0.37256 rad；每个物理步采样到的执行器力矩绝对值峰值约 0.661 N·m，低于该模拟模型的 ±1.5 N·m 限制。你的结果可能因环境不同而略有差异；这只检查两个模拟输入，不能证明真实机器人方向、标定、力矩或安全。
+
+本机验证环境为 Windows 64 位、Python 3.13.12、Gymnasium 1.4.0、MuJoCo 4.0.1、Stable-Baselines3 2.9.2、PyTorch 2.12.0（训练指定 CPU）、ONNX 1.21.0 和 ONNX Runtime 1.26.0。2026-11-16 已在不继承系统包的新虚拟环境里，按本包 `requirements.txt` 安装并从解压包完成训练、评估、导出及离线接口检查；这次使用了本机配置的 Python 包镜像。其他系统、网络或后续依赖供应可能产生不同结果。
 
 ## 参数与输入输出契约
 
@@ -84,7 +95,7 @@ ONNX 与 SB3 对 100 组相同输入的最大动作差为 `1.79e-7`；另在 10 
 ## 文件与资料
 
 - `model.xml`：单关节 MJCF。`joint_env.py`：Gymnasium 训练环境、奖励与终止条件。
-- `train.py`、`evaluate.py`：训练和基线比较。`export_onnx.py`：导出和相同输入数值比对。
+- `inspect_model.py`：正负已知参考的模型自检；`train.py`、`evaluate.py`：训练和基线比较。`export_onnx.py`：导出和相同输入数值比对。
 - `contract.py`、`deploy_offline.py`：不依赖 MuJoCo 或训练框架的预处理、后处理和离线推理示例。
 - `check_deployment.py`：仿真中的训练/部署契约一致性检查。`plot_results.py`：依据评估文件绘制结果。
 - [MuJoCo 位置执行器文档](https://mujoco.readthedocs.io/en/latest/XMLreference.html#actuator-position)；[Gymnasium 环境接口](https://gymnasium.farama.org/api/env/)；[Stable-Baselines3 ONNX 导出](https://stable-baselines3.readthedocs.io/en/master/guide/export.html)。
