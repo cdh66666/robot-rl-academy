@@ -1,0 +1,3 @@
+# Long-course videos are hosted as release assets; local files remain available
+# for the offline launcher and the Bilibili export package.
+/video/output/*.mp4
