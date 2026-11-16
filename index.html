@@ -6,8 +6,8 @@
   <meta name="description" content="从浏览器中的真实训练实验出发，循序渐进理解深度强化学习与机器人训练部署。">
   <title>机器人 RL 实验室｜从零训练到真实机器人</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/site.css?v=20261116-5">
-  <script defer src="assets/site.js?v=20261116-5"></script>
+  <link rel="stylesheet" href="assets/site.css?v=20261116-6">
+  <script defer src="assets/site.js?v=20261116-6"></script>
 </head>
 <body>
   <div class="rebuild-notice" role="status"><strong>课程正在重制：</strong>当前视频为此前约 35 分钟的短版预览，五小时完整版制作完成后会在此更新。</div>
@@ -99,6 +99,7 @@
                 <div class="field-grid"><label>机器人与目标<textarea name="task" placeholder="例如：双轮机器人，原地站稳 10 秒"></textarea></label><label>关节与驱动<textarea name="actuators" placeholder="电机/舵机型号、关节数、减速比、控制模式"></textarea></label></div>
                 <div class="field-grid"><label>可读取的观察量<textarea name="observations" placeholder="例如：关节角度 rad、角速度 rad/s、IMU；写出顺序与坐标系"></textarea></label><label>能发送的动作<textarea name="actions" placeholder="例如：每个关节目标角度 rad；范围、方向、发送频率"></textarea></label></div>
                 <div class="field-grid"><label>主控与通信<textarea name="controller" placeholder="主控型号、系统、通信协议、预计控制周期和延迟"></textarea></label><label>限制与待测参数<textarea name="limits" placeholder="角度/速度/电流限制、急停方式、摩擦、延迟等"></textarea></label></div>
+                <div class="field-grid"><label>奖励与结束条件<textarea name="reward_termination" placeholder="例如：接近目标的奖励、失败条件；区分任务终止与时间截断"></textarea></label><label>重置与独立评估<textarea name="reset_evaluation" placeholder="例如：初始角和目标范围、随机种子、成功指标及测试次数"></textarea></label></div>
                 <div class="form-actions"><button class="button primary" type="submit">生成 AI 任务说明</button><button class="button secondary" id="save-contract" type="button">下载接口表</button></div>
               </form>
             </div>

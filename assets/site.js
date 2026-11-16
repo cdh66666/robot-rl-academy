@@ -106,7 +106,7 @@
       e.preventDefault();
       const f = robotFields();
       const field = (name) => f[name]?.trim() || "待测／待补充";
-      $("#prompt-output").value = `请作为机器人强化学习工程师，与我一起制定一个可以复现和验证的训练项目。\n\n【任务和机器人】${field("task")}\n【关节与驱动】${field("actuators")}\n【真实可获得的观察】${field("observations")}\n【可发送动作】${field("actions")}\n【主控和通信】${field("controller")}\n【限制与待测参数】${field("limits")}\n\n请先列出关键缺失信息及其测量方法，不编造参数；逐项明确观察和动作的顺序、坐标系、单位、归一化、频率、上下限和超时处理。再给我 MuJoCo 模型、训练环境、奖励与终止条件、基线与独立评估计划，区分系统辨识与随机化。先生成仿真和离线回放代码，提供可运行测试和预期输出。部署时说明策略、接口适配、驱动闭环及独立安全层的边界；换主控时优先保持策略输入输出契约，明确哪些接口必须重写。未经具体硬件核验，不要自动连接实机或驱动电机，列出断电检查、通信只读、低风险分阶段验证及回退方法。每一步说明目的、操作和验收标准。`;
+      $("#prompt-output").value = `请作为机器人强化学习工程师，与我一起制定一个可以复现和验证的训练项目。\n\n【任务和机器人】${field("task")}\n【关节与驱动】${field("actuators")}\n【真实可获得的观察】${field("observations")}\n【可发送动作】${field("actions")}\n【主控和通信】${field("controller")}\n【限制与待测参数】${field("limits")}\n【奖励与结束条件】${field("reward_termination")}\n【重置与独立评估】${field("reset_evaluation")}\n\n请先列出关键缺失信息及其测量方法，不编造参数；逐项明确观察和动作的顺序、坐标系、单位、归一化、频率、上下限和超时处理。再给我 MuJoCo 模型、训练环境、奖励与终止条件、基线与独立评估计划，区分系统辨识与随机化。先生成仿真和离线回放代码，提供可运行测试和预期输出。部署时说明策略、接口适配、驱动闭环及独立安全层的边界；换主控时优先保持策略输入输出契约，明确哪些接口必须重写。未经具体硬件核验，不要自动连接实机或驱动电机，列出断电检查、通信只读、低风险分阶段验证及回退方法。每一步说明目的、操作和验收标准。`;
       $("#prompt-card").scrollIntoView({behavior:"smooth",block:"start"});
     });
     $("#copy-prompt").addEventListener("click", async e => {
